@@ -1,0 +1,21 @@
+{{- $uuid := .uuid -}}
+{{- $varname := .varname -}}
+{{- $field := "" -}}{{ if hasKey . "field" }}{{ $field = .field }}{{ end -}}
+{{- template "bw_validate" $uuid -}}
+{{- $item := rbw $uuid -}}
+{{- if eq $field "" }}
+export {{ $varname }}='{{ $item.data.password }}'
+{{- else if eq $field "username" }}
+export {{ $varname }}='{{ $item.data.username }}'
+{{- else -}}
+{{-   $found := false -}}
+{{-   range $item.fields -}}
+{{-     if eq .name $field }}
+export {{ $varname }}='{{ .value }}'
+{{-       $found = true -}}
+{{-     end -}}
+{{-   end -}}
+{{-   if not $found -}}
+{{-     fail (printf "Bitwarden item %s missing field %s" $uuid $field) -}}
+{{-   end -}}
+{{- end -}}

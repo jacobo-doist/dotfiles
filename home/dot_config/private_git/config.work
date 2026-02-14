@@ -1,0 +1,9 @@
+# Work-specific git settings
+# Managed by chezmoi-work — do not edit manually
+#
+# NOTE: Git identity (name, email, ghuser) is handled by the personal layer's
+# config.user.tmpl, which reads from 1Password based on the is_work flag.
+# This file is for work-specific aliases, settings, etc.
+
+[alias]
+    is-doist-repo = !git remote get-url origin 2>/dev/null | grep -q 'github.com.Doist'

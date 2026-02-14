@@ -1,0 +1,14 @@
+{{- $uuid := . -}}
+{{- $item := rbw $uuid -}}
+{{- $enabled := false -}}
+{{- $comment := "" -}}
+{{- range $item.fields -}}
+{{-   if eq .name "dotfiles_enabled" }}{{ $enabled = eq .value "true" }}{{ end -}}
+{{-   if eq .name "dotfiles_comment" }}{{ $comment = .value }}{{ end -}}
+{{- end -}}
+{{- if not $enabled -}}
+{{-   fail (printf "Bitwarden item %s does not have dotfiles_enabled=true" $uuid) -}}
+{{- end -}}
+{{ if ne $comment "" -}}
+# {{ $comment }}
+{{ end -}}

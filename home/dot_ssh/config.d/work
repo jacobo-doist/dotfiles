@@ -1,0 +1,8 @@
+# Work SSH hosts
+# Managed by chezmoi-work — do not edit manually
+
+# Example:
+# Host work-server
+#     HostName server.work.example.com
+#     User jacobo
+#     IdentityFile ~/.ssh/id_work

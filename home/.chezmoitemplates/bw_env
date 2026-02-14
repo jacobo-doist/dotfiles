@@ -1,0 +1,48 @@
+{{- $uuid := . -}}
+{{- template "bw_validate" $uuid -}}
+{{- $item := rbw $uuid -}}
+{{- $comments := dict -}}
+{{- range $item.fields -}}
+{{-   if hasSuffix ".comment" .name }}{{ $_ := set $comments (.name | trimSuffix ".comment") .value }}{{ end -}}
+{{- end -}}
+{{- $first := true -}}
+{{- range $item.fields -}}
+{{-   if and (hasPrefix "env." .name) (not (hasSuffix ".comment" .name)) -}}
+{{-     if not $first }}
+{{ end -}}
+{{-     $first = false -}}
+{{-     if hasKey $comments .name }}
+# {{ get $comments .name }}
+{{-     end -}}
+{{-     $varname := .name | trimPrefix "env." -}}
+{{-     $val := "" -}}
+{{-     if hasPrefix "bw:" .value -}}
+{{-       $ref := .value | trimPrefix "bw:" -}}
+{{-       $parts := splitList ":" $ref -}}
+{{-       $refUuid := index $parts 0 -}}
+{{-       $refItem := rbw $refUuid -}}
+{{-       if eq (len $parts) 1 -}}
+{{-         $val = $refItem.data.password -}}
+{{-       else -}}
+{{-         $source := index $parts 1 -}}
+{{-         if eq $source "username" -}}
+{{-           $val = $refItem.data.username -}}
+{{-         else -}}
+{{-           $found := false -}}
+{{-           range $refItem.fields -}}
+{{-             if eq .name $source -}}
+{{-               $val = .value -}}
+{{-               $found = true -}}
+{{-             end -}}
+{{-           end -}}
+{{-           if not $found -}}
+{{-             fail (printf "Bitwarden item %s missing field %s" $refUuid $source) -}}
+{{-           end -}}
+{{-         end -}}
+{{-       end }}
+export {{ $varname }}='{{ $val }}'
+{{-     else }}
+export {{ $varname }}="{{ .value }}"
+{{-     end -}}
+{{-   end -}}
+{{- end }}

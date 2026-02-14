@@ -1,0 +1,51 @@
+# Work dotfiles layer — .chezmoiignore
+#
+# This chezmoi instance shares a target directory ($HOME) with the personal
+# dotfiles layer. Without an ignore strategy, chezmoi would treat every file
+# from the personal layer as "unmanaged" and, in directories using the exact_
+# prefix (like .bash.d), would delete them to enforce its own desired state.
+#
+# To prevent this, we ignore everything by default and then selectively
+# un-ignore only the files that this work layer explicitly manages. This is
+# safer than listing personal files to ignore (allowlist approach) because
+# any new file added to the personal repo would need to be manually added
+# here — a maintenance burden and a source of subtle breakage.
+#
+# NOTE: When un-ignoring files in subdirectories, each parent directory in the
+# path must also be un-ignored — same behavior as .gitignore.
+
+*
+
+# --- Files managed by the work layer ---
+
+# Shell config: doist_* files in bash.d local dirs are tracked by this repo.
+# doist_local_* files are machine-specific and NOT tracked by either repo.
+#
+# Each parent directory must be explicitly un-ignored to allow chezmoi to
+# traverse into it. Ignoring * blocks all directory traversal, so without
+# these lines chezmoi would never see the files inside.
+!.bash.d/
+!.bash.d/local/
+!.bash.d/local/before/
+!.bash.d/local/before/doist_*
+.bash.d/local/before/doist_local_*
+!.bash.d/local/after/
+!.bash.d/local/after/doist_*
+.bash.d/local/after/doist_local_*
+
+# Same directory un-ignoring applies to all paths below.
+!.config/
+!.config/git/
+!.config/git/config.work
+!.config/starship.toml
+!.config/starship-ascii-prompt.toml
+
+!.local/
+!.local/bin/
+!.local/bin/chezmoi-work
+!.local/bin/cheznous
+!.local/bin/cheznous-rev
+
+!.ssh/
+!.ssh/config.d/
+!.ssh/config.d/work

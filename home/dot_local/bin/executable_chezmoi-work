@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Wrapper to invoke chezmoi with the work layer config.
+# Managed by chezmoi-work — do not edit manually.
+exec chezmoi --config ~/.config/chezmoi-work/chezmoi.toml "$@"

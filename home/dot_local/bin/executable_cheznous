@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+# cheznous — run a chezmoi command across both dotfiles layers.
+# Managed by chezmoi-work — do not edit manually.
+#
+# By default, runs personal first, then work. Set CHEZNOUS_REVERSE=1 or
+# invoke as cheznous-rev to reverse the order.
+
+set -euo pipefail
+
+declare -A LAYER_CMD=(
+    [personal]="chezmoi"
+    [work]="chezmoi-work"
+)
+
+# --- Help ---
+
+show_help() {
+    cat <<'EOF'
+cheznous — run a chezmoi command across both dotfiles layers
+
+Usage: cheznous [chezmoi-args...]
+       cheznous-rev [chezmoi-args...]
+
+Runs the given chezmoi command twice: once against the personal layer,
+once against the work layer.
+
+  cheznous       Personal first, then work (default)
+  cheznous-rev   Work first, then personal
+
+Any arguments are passed through to chezmoi verbatim. If --help appears
+anywhere in the arguments, this help text is shown instead of calling
+chezmoi twice.
+
+Environment:
+  CHEZNOUS_REVERSE=1   Same as invoking cheznous-rev
+
+Examples:
+  cheznous diff          # diff both layers, personal then work
+  cheznous apply         # apply both layers in order
+  cheznous-rev status    # status both layers, work then personal
+EOF
+    exit 0
+}
+
+# --- Check for help or no arguments ---
+
+for arg in "$@"; do
+    if [[ "$arg" == "--help" || "$arg" == "-h" || "$arg" == "help" ]]; then
+        show_help
+    fi
+done
+
+if [[ $# -eq 0 ]]; then
+    show_help
+fi
+
+# --- Determine order ---
+# Reverse if asked via env var or if invoked as cheznous-rev (symlink)
+
+order=(personal work)
+if [[ "${CHEZNOUS_REVERSE:-0}" == "1" || "$(basename "$0")" == "cheznous-rev" ]]; then
+    order=(work personal)
+fi
+
+# --- Run ---
+
+for layer in "${order[@]}"; do
+    echo "==> ${layer}: $*"
+    "${LAYER_CMD[$layer]}" "$@"
+done
