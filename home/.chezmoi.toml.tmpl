@@ -3,12 +3,20 @@ sourceDir = "~/.local/share/chezmoi-work"
 [diff]
     exclude = ["scripts"]
 
+[interpreters.py]
+    command = "uv"
+    args = ["--quiet", "run", "--script"]
+
 [bitwarden]
     unlock = "auto"
 
+{{- $is_macos := eq .chezmoi.os "darwin" -}}
+{{- $is_linux := eq .chezmoi.os "linux" }}
+
 [data]
-    # work_email and work_name come from 1Password (personal handles identity)
-    # Other work-specific template variables go here
+    is_macos = {{ $is_macos }}
+    is_linux = {{ $is_linux }}
+    is_work = true
 
 {{/*
 vim:ft=gotexttmpl:
