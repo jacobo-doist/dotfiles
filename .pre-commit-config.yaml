@@ -1,0 +1,30 @@
+repos:
+  - repo: https://github.com/koalaman/shellcheck-precommit
+    rev: v0.11.0
+    hooks:
+      - id: shellcheck
+        # -x: follow sourced files; -e SC2148: ignore missing shebang (sourced bash fragments)
+        args: ['-x', '-e', 'SC2148']
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.1
+    hooks:
+      - id: ruff
+        types_or: [python]
+      - id: ruff-format
+        types_or: [python]
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.0
+    hooks:
+      - id: gitleaks
+
+  - repo: local
+    hooks:
+      - id: llm-sensitive-data-review
+        name: LLM sensitive data review
+        entry: python scripts/llm_sensitive_data_review.py
+        language: python
+        stages: [pre-push]
+        pass_filenames: false
+        additional_dependencies: ['anthropic']

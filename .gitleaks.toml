@@ -1,0 +1,32 @@
+[extend]
+useDefault = true
+
+# Custom rules for this dotfiles repo
+#
+# Bitwarden UUIDs are fine — they're opaque and don't reveal anything.
+# What's dangerous is fetching secrets by human-readable name, which
+# reveals what the secret is for (e.g., rbw get "company-vpn-creds").
+# The [g-zG-Z] character class ensures we only match names containing
+# non-hex letters, so UUIDs (which only have [0-9a-f] and dashes) are
+# ignored.
+
+[[rules]]
+id = "bitwarden-secret-by-name"
+description = "Bitwarden secret fetched by human-readable name (use UUID instead)"
+regex = '''(?i)(?:rbw|bitwarden)\s*.{0,20}["'][^"']*[g-zG-Z][^"']*["']'''
+tags = ["bitwarden", "secret-name"]
+
+[[rules]]
+id = "bw-get-secret-by-name"
+description = "bw CLI fetching secret by human-readable name (use UUID instead)"
+regex = '''(?i)bw\s+get\s+.{0,20}["'][^"']*[g-zG-Z][^"']*["']'''
+tags = ["bitwarden", "secret-name"]
+
+# Allowlists — paths that are expected to contain patterns (e.g., this config itself)
+[allowlist]
+paths = [
+    '''.gitleaks.toml''',
+    '''.pre-commit-config.yaml''',
+    '''scripts/llm_sensitive_data_review.py''',
+    '''docs/multi-layer-setup.md''',
+]

@@ -23,6 +23,7 @@ has_top_level_format=$(echo "$config" | awk '/^\[/{exit} /^format[[:space:]]*=/{
 
 if [[ "$has_top_level_format" == "yes" ]]; then
     # Has explicit format — inject our module before $character
+    # shellcheck disable=SC2001,SC2016  # single quotes intentional; sed needed for \n
     config=$(echo "$config" | sed 's|\$character|$custom.gh_sec_alerts\\\n$character|')
 else
     # No explicit format — use $all plus our custom module
