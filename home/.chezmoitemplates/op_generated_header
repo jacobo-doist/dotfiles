@@ -1,0 +1,4 @@
+{{- /* Usage: template "op_generated_header" (dict "comment" "#" "document" "doc_name.yml" "vault" "dotfiles") */ -}}
+{{ .comment }} THIS FILE IS GENERATED — DO NOT EDIT DIRECTLY
+{{ .comment }} Source: 1Password document "{{ .document }}" in vault "{{ .vault }}"
+{{ .comment }} To edit: op-edit "{{ .document }}" --vault "{{ .vault }}", then run chezmoi-work apply

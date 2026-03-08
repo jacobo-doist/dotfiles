@@ -1,0 +1,131 @@
+#!/usr/bin/env -S uv run --script -q
+# /// script
+# requires-python = ">=3.10"
+# ///
+"""op-slurp — Upload a file to 1Password and create a chezmoi-work template.
+
+Takes an existing file, uploads it as a 1Password document, creates a
+chezmoi-work template that fetches it at apply time (with a generated-file
+header comment), and updates .chezmoiignore to un-ignore the target path.
+"""
+
+import argparse
+import subprocess
+import sys
+from pathlib import Path
+
+WORK_SOURCE = Path.home() / ".local/share/chezmoi-work/home"
+IGNORE_FILE = WORK_SOURCE / ".chezmoiignore"
+
+COMMENT_CHARS = {
+    "yml": "#", "yaml": "#", "toml": "#",
+    "sh": "#", "bash": "#", "zsh": "#",
+    "conf": "#", "py": "#",
+    "lua": "--",
+    "vim": '"',
+}
+
+
+def run(cmd: list[str], **kwargs) -> subprocess.CompletedProcess:
+    return subprocess.run(cmd, check=True, **kwargs)
+
+
+def comment_char(filename: str) -> str:
+    ext = filename.rsplit(".", 1)[-1] if "." in filename else ""
+    return COMMENT_CHARS.get(ext, "#")
+
+
+def make_template(comment: str, filename: str, vault: str) -> str:
+    return (
+        '{{- template "op_generated_header" (dict'
+        f' "comment" "{comment}"'
+        f' "document" "{filename}"'
+        f' "vault" "{vault}"'
+        ") }}\n"
+        "\n"
+        f'{{{{ onepasswordDocument "{filename}" "{vault}" -}}}}\n'
+    )
+
+
+def update_chezmoiignore(rel_path: str) -> bool:
+    ignore_text = IGNORE_FILE.read_text()
+    ignore_lines = set(ignore_text.splitlines())
+
+    additions = []
+
+    # Un-ignore each parent directory
+    parts = Path(rel_path).parent.parts
+    current = ""
+    for part in parts:
+        current = f"{current}{part}/"
+        entry = f"!{current}"
+        if entry not in ignore_lines:
+            additions.append(entry)
+
+    # Un-ignore the file itself
+    entry = f"!{rel_path}"
+    if entry not in ignore_lines:
+        additions.append(entry)
+
+    if additions:
+        with IGNORE_FILE.open("a") as f:
+            for line in additions:
+                f.write(f"{line}\n")
+        return True
+    return False
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("file", type=Path, help="File to slurp into 1Password")
+    parser.add_argument("--vault", default="dotfiles", help="1Password vault (default: dotfiles)")
+    parser.add_argument("--tag", default="doist", help="1Password tag (default: doist)")
+    parser.add_argument("--title", default=None, help="1Password document title (default: filename)")
+    args = parser.parse_args()
+
+    file = args.file.resolve()
+    if not file.is_file():
+        print(f"Error: {file} not found", file=sys.stderr)
+        sys.exit(1)
+
+    title = args.title or file.name
+    comment = comment_char(file.name)
+
+    # Step 1: Upload to 1Password
+    print(f"Uploading '{title}' to 1Password vault '{args.vault}' with tag '{args.tag}'...")
+    run(["op", "document", "create", str(file),
+         "--title", title, "--vault", args.vault, "--tags", args.tag])
+
+    # Step 2: Add to chezmoi-work (creates proper source path)
+    print("Adding to chezmoi-work...")
+    run(["chezmoi-work", "add", str(file)])
+
+    # Step 3: Get source path, replace with template
+    result = subprocess.run(
+        ["chezmoi-work", "source-path", str(file)],
+        check=True, capture_output=True, text=True,
+    )
+    source_path = Path(result.stdout.strip())
+
+    tmpl_path = source_path.with_name(source_path.name + ".tmpl")
+    print(f"Creating template at {tmpl_path}...")
+    tmpl_path.write_text(make_template(comment, title, args.vault))
+
+    # Remove the non-template source file
+    source_path.unlink()
+
+    # Step 4: Update .chezmoiignore
+    rel_path = str(file.relative_to(Path.home()))
+    if update_chezmoiignore(rel_path):
+        print("Updated .chezmoiignore")
+
+    print()
+    print("Done! Verify with:")
+    print(f"  chezmoi-work cat ~/{rel_path}")
+    print()
+    print("Then apply with:")
+    print(f"  chezmoi-work apply")
+
+
+if __name__ == "__main__":
+    main()
