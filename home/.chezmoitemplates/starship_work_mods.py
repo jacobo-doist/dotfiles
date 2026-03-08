@@ -54,13 +54,23 @@ def has_top_level_format(config: str) -> bool:
 
 
 def inject_format(config: str) -> str:
-    """Inject the work module into the format string."""
+    """Inject the work module into the format string.
+
+    Places the module on the first line (before $line_break) so it appears
+    alongside other modules, not on the prompt input line.
+    """
     if has_top_level_format(config):
-        # Insert our module on a new line before $character
-        config = config.replace("$character", FORMAT_INJECTION + "$character", 1)
+        # Insert before $line_break to keep it on line 1
+        if "$line_break" in config:
+            config = config.replace("$line_break", FORMAT_INJECTION + "$line_break", 1)
+        else:
+            # Single-line prompt — insert before $character
+            config = config.replace("$character", FORMAT_INJECTION + "$character", 1)
     else:
-        # No explicit format — prepend one with $all plus our module
-        config = 'format = "$all${custom.gh_sec_alerts}"\n' + config
+        # No explicit format — build one that places our module on line 1.
+        # By listing $line_break and $character explicitly, they're excluded
+        # from $all, letting us control their position.
+        config = 'format = "$all${custom.gh_sec_alerts}$line_break$character"\n' + config
 
     return config
 
