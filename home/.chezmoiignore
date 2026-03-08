@@ -33,19 +33,37 @@
 !.bash.d/local/after/doist_*
 .bash.d/local/after/doist_local_*
 
+# ZSH config (alongside existing .bash.d entries)
+!.config/zsh/
+!.config/zsh/zsh.d/
+!.config/zsh/zsh.d/local/
+!.config/zsh/zsh.d/local/before/
+!.config/zsh/zsh.d/local/before/doist_*
+.config/zsh/zsh.d/local/before/doist_local_*
+!.config/zsh/zsh.d/local/after/
+!.config/zsh/zsh.d/local/after/doist_*
+.config/zsh/zsh.d/local/after/doist_local_*
+
 # Same directory un-ignoring applies to all paths below.
 !.config/
 !.config/git/
 !.config/git/config.work
 !.config/starship.toml
 !.config/starship-ascii-prompt.toml
+!.config/alacritty/
+!.config/alacritty/work.toml
+!.config/espanso/
+!.config/espanso/match/
+!.config/espanso/match/doist_backend_arcs.yml
 
 !.local/
 !.local/bin/
 !.local/bin/chezmoi-work
 !.local/bin/cheznous
 !.local/bin/cheznous-rev
+!.local/bin/op-slurp
 
 !.ssh/
 !.ssh/config.d/
 !.ssh/config.d/work
+!.config/espanso/match/doist_snippets.yml
