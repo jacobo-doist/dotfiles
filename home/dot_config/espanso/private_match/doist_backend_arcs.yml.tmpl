@@ -1,0 +1,19 @@
+{{- $data := onepasswordDocument "db_doist_backend_arcs.yml" "dotfiles" | fromYaml -}}
+{{ template "op_generated_header" (dict "comment" "#" "document" "db_doist_backend_arcs.yml" "vault" "dotfiles") }}
+
+matches:
+{{- range $data.arcs }}
+
+  - triggers:
+      - ",,arc{{ .number }}-"
+      - ",,arc{{ .short }}"
+    replace: "Arc {{ .number }}: {{ .name }}"
+  - triggers:
+      - ",,larc{{ .number }}-"
+      - ",,larc{{ .short }}"
+    replace: "{{ .link }}"
+  - triggers:
+      - ",,mdarc{{ .number }}-"
+      - ",,mdarc{{ .short }}"
+    replace: "[Arc {{ .number }}: {{ .name }}]({{ .link }})"
+{{- end }}
