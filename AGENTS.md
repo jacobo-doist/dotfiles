@@ -13,7 +13,7 @@ Two-layer dotfiles: personal (`jdevera/dotfiles`) + work (this repo). Both use c
 ## Conventions
 
 - **Commits**: `Area: Description` (e.g., `Chezmoi:`, `Bash:`, `Git:`, `SSH:`, `Scripts:`, `Docs:`, `Install:`)
-- **Co-authorship**: include `Co-authored-by: Claude (<model-id>) <noreply@anthropic.com>`
+- **Co-authorship**: when an AI assistant materially authors a change, include the matching GitHub trailer: `Co-authored-by: Claude (<model-id>) <noreply@anthropic.com>` for Claude, or `Co-authored-by: Codex <noreply@openai.com>` for Codex.
 - **Bash files**: `doist_*.sh` in `local/before/` and `local/after/` — tracked by this repo. `doist_local_*` — untracked, machine-specific
 - **chezmoiignore**: deny-all (`*`) then un-ignore specific files. Each parent dir must be un-ignored for traversal
 - **No `exact_`**: work layer never uses `exact_` prefix — personal layer handles directory enforcement
