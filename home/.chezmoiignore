@@ -67,3 +67,6 @@
 !.ssh/config.d/
 !.ssh/config.d/work
 !.config/espanso/match/doist_snippets.yml
+
+!.config/natetty/
+!.config/natetty/natetty.toml
