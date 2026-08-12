@@ -50,8 +50,6 @@
 !.config/git/config.work
 !.config/starship.toml
 !.config/starship-ascii-prompt.toml
-!.config/alacritty/
-!.config/alacritty/work.toml
 !.config/espanso/
 !.config/espanso/match/
 !.config/espanso/match/doist_backend_arcs.yml
