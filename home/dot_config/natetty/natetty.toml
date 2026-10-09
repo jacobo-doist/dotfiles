@@ -11,7 +11,7 @@ working_directory = "/Users/jdevera/Library/Mobile Documents/iCloud~md~obsidian/
 
 [terminal.shell]
 program = "/bin/zsh"
-args = ["--login", "-i", "-c", "/Users/jdevera/.local/bin/nate new"]
+args = ["--login", "-i", "-c", "/Users/jdevera/.local/bin/nate start-session"]
 
 [window]
 title = "Nate 🧭 - Jacobo's Assistant"
@@ -72,7 +72,11 @@ save_to_clipboard = true
 [keyboard]
 bindings = [
   # Make Shift+Enter send a distinct sequence so Claude Code recognizes it as newline, not submit
-  { key = "Return", mods = "Shift", chars = "\u001b[13;2u" }
+  { key = "Return", mods = "Shift", chars = "\u001b[13;2u" },
+  # Ctrl+Shift+F as CSI-u so tmux can see it (window picker, bound in tmux.conf)
+  { key = "F", mods = "Control|Shift", chars = "\u001b[102;6u" },
+  # Ctrl+Shift+H as CSI-u: jump to the home chat (bound in nate.tmux.conf)
+  { key = "H", mods = "Control|Shift", chars = "\u001b[104;6u" }
 ]
 
 [hints]
