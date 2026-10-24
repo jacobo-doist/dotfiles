@@ -163,6 +163,25 @@ The work layer places `~/.ssh/config.d/work` with work-specific host entries.
 A `~/.ssh/config.d/local` file is seeded empty (via chezmoi's `create_`
 prefix) for untracked machine-specific SSH config.
 
+### Packages — `~/.config/mise/conf.d/work.toml`
+
+The work layer installs its own packages with the personal layer's package
+machinery. `home/.chezmoidata/packages.yml` lists them and
+`home/.chezmoidata/package_specs.yml` says how to install each one, in the
+same format as the personal layer (see its `add-software-package` skill).
+Packages that resolve to mise (today, Todoist's own CLIs) are rendered into
+`~/.config/mise/conf.d/work.toml`, next to the personal layer's
+`conf.d/dotfiles.toml`; `run_onchange_after_036-mise-install` runs
+`mise install` and each declared `post_install` command whenever that file
+changes. `chezmoi-work-list-packages` shows what resolves to what.
+
+A chezmoi instance can only include templates from its own source directory,
+so the machinery (templates, validation and install scripts, schema, list
+tool) is copied from the personal layer. Each copy carries a
+`KEEP IN SYNC with jdevera/dotfiles: <path>` line, and `scripts/check-sync`
+(a pre-commit hook) fails when a copy differs from its original in any other
+way. Change the personal original first, then copy it over.
+
 ## Secrets
 
 **Identity** (email, name, GitHub user) stays in **1Password**. The personal

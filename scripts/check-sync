@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+#
+# check-sync — fail when a file copied from the personal layer has drifted.
+#
+# The work layer carries exact copies of some personal-layer files (the
+# package machinery and the bash library), because a chezmoi instance can only
+# include templates from its own source directory. Each copy names its
+# original on a marker line:
+#
+#     KEEP IN SYNC with jdevera/dotfiles: home/<path>
+#
+# (inside whatever comment syntax the file uses). This check finds every such
+# line under home/, drops it from the copy, and compares the rest byte for
+# byte with the original in the personal layer's source directory. To fix a
+# failure, copy the personal file over again and re-add the marker line.
+#
+# Skips with a notice when the personal layer is not checked out (e.g. in CI).
+# Set PERSONAL_DOTFILES to point at it elsewhere.
+#
+set -euo pipefail
+
+marker='KEEP IN SYNC with jdevera/dotfiles:'
+personal="${PERSONAL_DOTFILES:-$HOME/.local/share/chezmoi}"
+repo_root="$(cd "$(dirname "$0")/.." && pwd)"
+
+if [[ ! -d $personal/home ]]; then
+    echo "check-sync: personal layer not found at $personal; skipping." >&2
+    exit 0
+fi
+
+rc=0
+count=0
+while IFS= read -r copy; do
+    [[ -n $copy ]] || continue
+    line="$(grep -F "$marker" "$copy")"
+    original_rel="${line#*"$marker" }"
+    original_rel="${original_rel%% *}"
+    original="$personal/$original_rel"
+    count=$((count + 1))
+    if [[ ! -f $original ]]; then
+        echo "${copy#"$repo_root"/}: original $original_rel does not exist in $personal" >&2
+        rc=1
+        continue
+    fi
+    # Both sides go through grep, so a missing final newline counts on neither.
+    if ! diff -u \
+        --label "personal: $original_rel" --label "work: ${copy#"$repo_root"/}" \
+        <(grep -vF "$marker" "$original" || true) \
+        <(grep -vF "$marker" "$copy" || true) >&2; then
+        rc=1
+    fi
+done < <(grep -rlF "$marker" "$repo_root/home" || true)
+
+if [[ $rc -ne 0 ]]; then
+    echo >&2
+    echo "Work copies differ from their personal-layer originals (see above)." >&2
+    echo "Copy the personal file over again and re-add its KEEP IN SYNC line." >&2
+else
+    echo "check-sync: $count copies match the personal layer."
+fi
+
+exit $rc

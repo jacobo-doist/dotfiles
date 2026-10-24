@@ -21,6 +21,12 @@ repos:
 
   - repo: local
     hooks:
+      - id: check-sync
+        name: personal-layer copies in sync
+        entry: scripts/check-sync
+        language: script
+        pass_filenames: false
+        always_run: true
       - id: llm-sensitive-data-review
         name: LLM sensitive data review
         entry: python scripts/llm_sensitive_data_review.py

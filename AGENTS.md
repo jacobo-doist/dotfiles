@@ -17,6 +17,8 @@ Two-layer dotfiles: personal (`jdevera/dotfiles`) + work (this repo). Both use c
 - **Bash files**: `doist_*.sh` in `local/before/` and `local/after/` — tracked by this repo. `doist_local_*` — untracked, machine-specific
 - **chezmoiignore**: deny-all (`*`) then un-ignore specific files. Each parent dir must be un-ignored for traversal
 - **No `exact_`**: work layer never uses `exact_` prefix — personal layer handles directory enforcement
+- **Copies of personal-layer files**: files with a `KEEP IN SYNC with jdevera/dotfiles: <path>` line (the package machinery, `dotfiles_bashlib.sh`) are copies; edit the personal original, copy it over, keep the marker line. `scripts/check-sync` (pre-commit hook) enforces it
+- **Packages**: work packages go in `home/.chezmoidata/packages.yml` and `package_specs.yml`, same format as the personal layer; see [docs/multi-layer-setup.md](docs/multi-layer-setup.md#packages--configmiseconfdworktoml)
 
 ## Commands
 
