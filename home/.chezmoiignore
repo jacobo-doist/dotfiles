@@ -48,6 +48,7 @@
 !.config/
 !.config/git/
 !.config/git/config.work
+!.config/git/config.signing
 !.config/starship.toml
 !.config/starship-ascii-prompt.toml
 !.config/espanso/

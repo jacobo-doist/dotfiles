@@ -1,0 +1,21 @@
+# Commit signing with the work SSH key.
+# Managed by chezmoi-work — do not edit manually
+#
+# Included from config.work only for repos whose remote is in the company
+# GitHub org (see the includeIf blocks there). The key is the same ed25519 key
+# used for GitHub authentication, registered on the jacobo-doist account a
+# second time as a Signing Key.
+
+[gpg]
+    format = ssh
+
+[user]
+    signingkey = ~/.ssh/id_ed25519.pub
+
+[commit]
+    gpgsign = true
+
+[tag]
+    gpgsign = true
+
+# vim: ft=gitconfig :

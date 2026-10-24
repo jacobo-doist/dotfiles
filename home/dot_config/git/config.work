@@ -7,3 +7,17 @@
 
 [alias]
     is-doist-repo = !git remote get-url origin 2>/dev/null | grep -q 'github.com.Doist'
+
+# Commit signing, work repos only. Required by the Secure development policy
+# since 2026-10-23 (GitHub ruleset Doist/infra#1121 rejects unsigned commits on
+# main). Loaded only when a remote points at the company GitHub org, so personal
+# repos stay unsigned. The org is Doist today and renames to Todoist, hence the
+# four spellings per URL scheme.
+[includeIf "hasconfig:remote.*.url:git@github.com:[Dd]oist/**"]
+    path = ~/.config/git/config.signing
+[includeIf "hasconfig:remote.*.url:git@github.com:[Tt]odoist/**"]
+    path = ~/.config/git/config.signing
+[includeIf "hasconfig:remote.*.url:https://github.com/[Dd]oist/**"]
+    path = ~/.config/git/config.signing
+[includeIf "hasconfig:remote.*.url:https://github.com/[Tt]odoist/**"]
+    path = ~/.config/git/config.signing
