@@ -1,0 +1,12 @@
+# Packages the work layer installs, on top of the personal layer's. Each name
+# needs an entry in package_specs.yml. Same format as the personal layer's
+# packages.yml: a plain name, or a map with name and only_when (macos, linux,
+# gui, headless, work, personal; ANDed).
+packages:
+  - automations-cli
+  - bob-cli
+  - comms-cli
+  - granola-cli
+  - outline-cli
+  - quick-cli
+  - todoist-cli

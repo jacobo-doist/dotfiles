@@ -51,6 +51,13 @@
 !.local/bin/cheznous
 !.local/bin/cheznous-rev
 !.local/bin/op-slurp
+!.local/bin/chezmoi-work-list-packages
+
+# Work mise tools, rendered from .chezmoidata/package_specs.yml. The personal
+# layer owns the rest of .config/mise/ (conf.d/dotfiles.toml).
+!.config/mise/
+!.config/mise/conf.d/
+!.config/mise/conf.d/work.toml
 
 !.ssh/
 !.ssh/config.d/

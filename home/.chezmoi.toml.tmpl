@@ -16,6 +16,9 @@ sourceDir = "~/.local/share/chezmoi-work"
 [data]
     is_macos = {{ $is_macos }}
     is_linux = {{ $is_linux }}
+    # The package machinery's only_when filters (gui/headless) need it. Work
+    # machines with a GUI are Macs; the personal layer also lists GUI Linux hosts.
+    has_gui = {{ $is_macos }}
     is_work = true
 
 {{/*

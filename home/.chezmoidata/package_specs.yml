@@ -1,0 +1,70 @@
+# yaml-language-server: $schema=./.package_specs.schema.yml
+---
+# Software package specs for the work layer: how to install each package
+# packages.yml lists. Same format as the personal layer's package_specs.yml
+# (schema in .package_specs.schema.yml, a synced copy).
+#
+# Todoist's own CLIs: no release-age wait (minimum_release_age "0s"), we trust
+# what we publish. Most also have few downloads, so mise needs
+# allow_low_downloads to install them.
+softwarePackages:
+  todoist-cli:
+    description: Command-line interface for Todoist (td)
+    homepage: https://github.com/Doist/todoist-cli
+    mise:
+      tool: npm:@doist/todoist-cli
+      minimum_release_age: 0s
+      post_install:
+        - td skill install claude-code --force
+  comms-cli:
+    description: Command-line interface for Todoist Comms (tdc)
+    homepage: https://github.com/Doist/comms-cli
+    mise:
+      tool: npm:@doist/comms-cli
+      allow_low_downloads: true
+      minimum_release_age: 0s
+      post_install:
+        - tdc skill install claude-code --force
+  bob-cli:
+    description: Command-line interface for HiBob (bob)
+    homepage: https://github.com/Doist/bob-cli
+    mise:
+      tool: npm:@doist/bob-cli
+      allow_low_downloads: true
+      minimum_release_age: 0s
+      post_install:
+        - bob skill install claude-code --force
+  granola-cli:
+    description: Command-line interface for the Granola API (granola)
+    homepage: https://github.com/Doist/granola-cli
+    mise:
+      tool: npm:@doist/granola-cli
+      allow_low_downloads: true
+      minimum_release_age: 0s
+      post_install:
+        - granola skill install claude-code --force
+  outline-cli:
+    description: Command-line interface for the Outline wiki (ol)
+    homepage: https://github.com/Doist/outline-cli
+    mise:
+      tool: npm:@doist/outline-cli
+      allow_low_downloads: true
+      minimum_release_age: 0s
+      post_install:
+        - ol skill install claude-code --force
+  quick-cli:
+    description: Publishes internal static HTML artifacts (quick); has no skill
+    mise:
+      tool: npm:@doist/quick-cli
+      allow_low_downloads: true
+      minimum_release_age: 0s
+  automations-cli:
+    description: Command-line interface for Todoist Automations (tda)
+    mise:
+      tool: npm:@doist/automations-cli
+      # Published under the "internal" dist-tag; "latest" is a 0.0.0 placeholder.
+      version: internal
+      allow_low_downloads: true
+      minimum_release_age: 0s
+      post_install:
+        - tda skill install claude-code --force

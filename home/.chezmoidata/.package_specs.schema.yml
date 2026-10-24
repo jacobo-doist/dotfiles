@@ -1,0 +1,126 @@
+# KEEP IN SYNC with jdevera/dotfiles: home/.chezmoidata/.package_specs.schema.yml (scripts/check-sync fails on any other difference)
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Package Specs
+type: object
+required:
+  - softwarePackages
+properties:
+  softwarePackages:
+    type: object
+    description: Map of logical package names to installer specifications
+    additionalProperties:
+      type: object
+      description: Installer specifications for a package
+      properties:
+        description:
+          type: string
+          description: Description of the package
+        homepage:
+          type: string
+          description: Homepage of the package
+        brew:
+          type: string
+          description: Homebrew formula name
+        apt:
+          type: string
+          description: Debian/Ubuntu APT package name
+        dnf:
+          description: Fedora DNF package name (string) or object with package and optional copr/repo
+          oneOf:
+            - type: string
+            - type: object
+              required: [package]
+              properties:
+                package:
+                  type: string
+                  description: DNF package name
+                copr:
+                  type: string
+                  description: COPR repository to enable (user/project format)
+                repo:
+                  type: string
+                  description: |-
+                    URL of a .repo file to add via `dnf config-manager addrepo`
+                    before installing (e.g. https://mise.jdx.dev/rpm/mise.repo)
+              additionalProperties: false
+        cask:
+          type: string
+          description: Homebrew cask name
+        mas:
+          description: |-
+            Mac App Store app id (mas-cli). Preferred over brew/cask on macOS.
+          oneOf:
+            - type: integer
+            - type: string
+        uv:
+          $ref: "#/$defs/uvDef"
+        mise:
+          $ref: "#/$defs/miseDef"
+        script:
+          type: string
+          description: |-
+            Shell script to install the package.
+        check:
+          type: object
+          description: How to check if the package is already installed (used by the script method)
+          properties:
+            command:
+              type: string
+              description: Command name to look up in PATH
+          additionalProperties: false
+      additionalProperties: false
+additionalProperties: false
+
+$defs:
+  miseDef:
+    description: |-
+      mise tool, declared in a ~/.config/mise/conf.d/ file and installed with
+      `mise install`. Either a tool spec string, carrying the backend in its
+      prefix and optionally a version after @ (node@lts, aqua:getsops/sops,
+      github:owner/repo, npm:@scope/pkg; the version defaults to "latest"),
+      or a table.
+    oneOf:
+      - type: string
+      - type: object
+        required: [tool]
+        properties:
+          tool:
+            type: string
+            description: mise tool id, with its backend prefix (e.g. npm:@scope/pkg)
+          version:
+            type: string
+            description: Version or dist-tag to declare (default "latest")
+          post_install:
+            type: array
+            items:
+              type: string
+            description: |-
+              Shell commands to run after `mise install`, with mise's tools
+              on PATH. They rerun whenever the conf.d file changes, so they
+              must be idempotent.
+        additionalProperties:
+          description: |-
+            Any other key is a mise per-tool option, passed through as-is
+            (e.g. minimum_release_age, allow_low_downloads, allow_builds,
+            trust_policy_excludes).
+  uvDef:
+    description: |
+      UV package spec: either a string name or an object with name and optional
+      with
+    oneOf:
+      - type: string
+      - type: object
+        required: [name]
+        properties:
+          name:
+            type: string
+            description: Package name
+          with:
+            oneOf:
+              - type: string
+              - type: array
+                items:
+                  type: string
+            description: Additional packages (string or array of strings)
+        additionalProperties: false
+

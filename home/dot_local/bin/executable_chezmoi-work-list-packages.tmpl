@@ -1,0 +1,126 @@
+{{- /* KEEP IN SYNC with jdevera/dotfiles: home/dot_local/bin/executable_chezmoi-list-packages.tmpl (scripts/check-sync fails on any other difference) */ -}}
+{{- $chezmoi := .chezmoi -}}
+{{- $specs := .softwarePackages -}}
+
+{{- /* Build the packages list */ -}}
+{{- $pkg_names := splitList " " (includeTemplate "resolve_packages.tmpl" (dict "list" .packages "dot" .)) -}}
+
+{{- /* Build the install_tools list */ -}}
+{{- $tool_names := list -}}
+{{- if hasKey . "install_tools" -}}
+{{-   $tool_names = splitList " " (includeTemplate "resolve_packages.tmpl" (dict "list" .install_tools "dot" .)) -}}
+{{- end -}}
+
+{{- /* Combine both lists with a tag for later separation */ -}}
+{{- $all := list -}}
+{{- range $name := $tool_names -}}
+{{-   $all = append $all (dict "name" $name "list" "install_tools") -}}
+{{- end -}}
+{{- range $name := $pkg_names -}}
+{{-   $all = append $all (dict "name" $name "list" "packages") -}}
+{{- end -}}
+
+{{- /* Resolve each package to method + detail */ -}}
+{{- $pkg_lines := list -}}
+{{- $tool_lines := list -}}
+{{- range $entry := $all -}}
+{{-   $name := $entry.name -}}
+{{-   if not $name -}}{{- continue -}}{{- end -}}
+{{-   $spec := get $specs $name -}}
+{{-   $method := includeTemplate "package_method.tmpl" (dict "spec" $spec "os" $chezmoi.os) -}}
+{{-   $detail := "-" -}}
+{{-   if eq $method "mas" -}}
+{{-     $detail = toString $spec.mas -}}
+{{-   else if eq $method "brew" -}}
+{{-     $detail = $spec.brew -}}
+{{-   else if eq $method "cask" -}}
+{{-     $detail = $spec.cask -}}
+{{-   else if eq $method "apt" -}}
+{{-     $detail = $spec.apt -}}
+{{-   else if eq $method "dnf" -}}
+{{-     $val := $spec.dnf -}}
+{{-     if kindIs "string" $val -}}
+{{-       $detail = $val -}}
+{{-     else if hasKey $val "copr" -}}
+{{-       $detail = printf "%s (copr: %s)" $val.package $val.copr -}}
+{{-     else -}}
+{{-       $detail = $val.package -}}
+{{-     end -}}
+{{-   else if eq $method "uv" -}}
+{{-     $u := $spec.uv -}}
+{{-     if kindIs "string" $u -}}
+{{-       $detail = $u -}}
+{{-     else -}}
+{{-       $detail = $u.name -}}
+{{-       if hasKey $u "with" -}}
+{{-         if kindIs "string" $u.with -}}
+{{-           $detail = printf "%s (with: %s)" $u.name $u.with -}}
+{{-         else if $u.with -}}
+{{-           $detail = printf "%s (with: %s)" $u.name (join ", " $u.with) -}}
+{{-         end -}}
+{{-       end -}}
+{{-     end -}}
+{{-   else if eq $method "mise" -}}
+{{-     $m := $spec.mise -}}
+{{-     if kindIs "string" $m -}}
+{{-       $detail = $m -}}
+{{-     else -}}
+{{-       $detail = printf "%s@%s" $m.tool (toString (get $m "version" | default "latest")) -}}
+{{-     end -}}
+{{-   else if eq $method "script" -}}
+{{-     $detail = "(inline)" -}}
+{{-   else -}}
+{{-     $method = "none" -}}
+{{-   end -}}
+{{-   $line := printf "  %-28s %-8s %s" $name $method $detail -}}
+{{-   if eq $entry.list "packages" -}}
+{{-     $pkg_lines = append $pkg_lines $line -}}
+{{-   else -}}
+{{-     $tool_lines = append $tool_lines $line -}}
+{{-   end -}}
+{{- end -}}
+{{- $pkg_lines = sortAlpha $pkg_lines -}}
+{{- $tool_lines = sortAlpha $tool_lines -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+show_header() {
+    echo "Platform: {{ $chezmoi.os }}{{ if eq $chezmoi.os "darwin" }} (macOS){{ else }} (Linux){{ end }}"
+    echo "GUI: {{ if $.has_gui }}yes{{ else }}no{{ end }}"
+}
+
+show_packages() {
+    echo
+    echo "Packages ({{ len $pkg_lines }}):"
+{{ range $line := $pkg_lines }}    echo {{ $line | squote }}
+{{ end -}}
+}
+
+show_install_tools() {
+    echo
+    echo "Install tools ({{ len $tool_lines }}):"
+{{ range $line := $tool_lines }}    echo {{ $line | squote }}
+{{ end -}}
+}
+
+list="${1:-packages}"
+
+case "$list" in
+    packages)
+        show_header
+        show_packages
+        ;;
+    install_tools)
+        show_header
+        show_install_tools
+        ;;
+    all)
+        show_header
+        show_install_tools
+        show_packages
+        ;;
+    *)
+        echo "Usage: ${0##*/} [packages|install_tools|all]" >&2
+        exit 1
+        ;;
+esac

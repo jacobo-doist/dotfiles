@@ -1,0 +1,10 @@
+{{- /* KEEP IN SYNC with jdevera/dotfiles: home/.chezmoiscripts/run_onchange_after_035-install-packages.sh.tmpl (scripts/check-sync fails on any other difference) */ -}}
+{{- $package_names := splitList " " (includeTemplate "resolve_packages.tmpl" (dict "list" .packages "dot" .)) -}}
+{{- includeTemplate "install_packages.sh.tmpl" (dict
+    "title" "install packages"
+    "package_names" $package_names
+    "softwarePackages" .softwarePackages
+    "chezmoi" .chezmoi
+    "is_macos" .is_macos
+    "is_linux" .is_linux
+) -}}

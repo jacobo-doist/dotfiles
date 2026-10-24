@@ -1,0 +1,13 @@
+# mise configuration managed by the work dotfiles layer. Do not edit: chezmoi
+# renders it from home/dot_config/mise/conf.d/work.toml.tmpl.
+#
+# mise reads every ~/.config/mise/conf.d/*.toml as global config; the personal
+# layer owns conf.d/dotfiles.toml and the settings.
+#
+# [tools] is generated: it declares every package from this layer's
+# packages.yml whose install method on this machine is mise, with the version
+# and options package_specs.yml gives it. The run_onchange_after_036-mise-install
+# script runs `mise install` and the declared post_install commands whenever
+# this file changes.
+
+{{ includeTemplate "mise_tools.toml.tmpl" (dict "list" .packages "dot" .) | trim }}
