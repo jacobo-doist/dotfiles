@@ -6,3 +6,24 @@
 #     HostName server.work.example.com
 #     User jacobo
 #     IdentityFile ~/.ssh/id_work
+#
+Host *
+    UseKeychain yes
+    AddKeysToAgent yes
+    IdentityFile ~/.ssh/id_ed25519
+
+Host github.com
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
+
+
+# Doist ephemeral production consoles
+# Keeping warnings to a minimum
+Host console-*
+    UserKnownHostsFile /tmp/ephemeral-console-host-keys
+    StrictHostKeyChecking accept-new
+    SetEnv LC_ALL=C.UTF-8 LANG=C.UTF-8
+
+# vim: ft=sshconfig :
