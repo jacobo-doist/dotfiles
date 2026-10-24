@@ -3,7 +3,7 @@
 # This chezmoi instance shares a target directory ($HOME) with the personal
 # dotfiles layer. Without an ignore strategy, chezmoi would treat every file
 # from the personal layer as "unmanaged" and, in directories using the exact_
-# prefix (like .bash.d), would delete them to enforce its own desired state.
+# prefix (like zsh.d), would delete them to enforce its own desired state.
 #
 # To prevent this, we ignore everything by default and then selectively
 # un-ignore only the files that this work layer explicitly manages. This is
@@ -18,22 +18,12 @@
 
 # --- Files managed by the work layer ---
 
-# Shell config: doist_* files in bash.d local dirs are tracked by this repo.
+# Shell config: doist_* files in zsh.d local dirs are tracked by this repo.
 # doist_local_* files are machine-specific and NOT tracked by either repo.
 #
 # Each parent directory must be explicitly un-ignored to allow chezmoi to
 # traverse into it. Ignoring * blocks all directory traversal, so without
 # these lines chezmoi would never see the files inside.
-!.bash.d/
-!.bash.d/local/
-!.bash.d/local/before/
-!.bash.d/local/before/doist_*
-.bash.d/local/before/doist_local_*
-!.bash.d/local/after/
-!.bash.d/local/after/doist_*
-.bash.d/local/after/doist_local_*
-
-# ZSH config (alongside existing .bash.d entries)
 !.config/zsh/
 !.config/zsh/zsh.d/
 !.config/zsh/zsh.d/local/

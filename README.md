@@ -12,7 +12,7 @@ Both layers are managed with [chezmoi](https://www.chezmoi.io/), each running
 as its own instance with separate source and config paths, both targeting
 `$HOME`. Personal is applied first, work second. They don't conflict because
 each layer uses native include mechanisms (git includes, SSH `Include`,
-bash.d sourcing) to extend rather than override.
+zsh.d sourcing) to extend rather than override.
 
 Curious how this actually works? See
 [docs/multi-layer-setup.md](docs/multi-layer-setup.md) for the full
@@ -52,18 +52,21 @@ layer order.
 
 ## 🐚 Shell
 
-The personal layer loads bash config from `.bash.d/` in this order:
-1. `.bash.d/local/before/*` — machine-specific, before main config
-2. `.bash.d/*` — main config files (personal layer)
-3. `.bash.d/local/after/*` — machine-specific overrides
+The personal layer loads zsh config from `~/.config/zsh/zsh.d/` in this order:
+1. `zsh.d/local/before/*` — machine-specific, before main config
+2. `zsh.d/*` — main config files (personal layer)
+3. `zsh.d/local/after/*` — machine-specific overrides
 
 This repo places work shell config in `local/before/` and `local/after/`
 using the `doist_` prefix convention:
 
 | Pattern | Tracked by | Example |
 |---------|-----------|---------|
-| `doist_*.sh` | This repo | `doist_env.sh`, `doist_aliases.sh` |
-| `doist_local_*.sh` | Nothing (machine-specific) | `doist_local_vpn.sh` |
+| `doist_*.zsh` | This repo | `doist_env.zsh`, `doist_aliases.zsh` |
+| `doist_local_*.zsh` | Nothing (machine-specific) | `doist_local_vpn.zsh` |
+
+Bash gets no work config: the personal layer keeps bash to one minimal
+`~/.config/bash/init.bash`.
 
 This keeps work config cleanly separated from personal config and from
 untracked machine-specific files, all within the same directory structure.

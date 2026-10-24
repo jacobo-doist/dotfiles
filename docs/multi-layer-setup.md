@@ -83,18 +83,19 @@ strategy:
 *
 
 # Un-ignore directory paths to allow traversal, then specific files/patterns
-!.bash.d/
-!.bash.d/local/
-!.bash.d/local/before/
-!.bash.d/local/before/doist_*
-!.bash.d/local/after/
-!.bash.d/local/after/doist_*
+!.config/
+!.config/zsh/
+!.config/zsh/zsh.d/
+!.config/zsh/zsh.d/local/
+!.config/zsh/zsh.d/local/before/
+!.config/zsh/zsh.d/local/before/doist_*
+!.config/zsh/zsh.d/local/after/
+!.config/zsh/zsh.d/local/after/doist_*
 
 # Re-ignore machine-specific work files (not tracked by either repo)
-.bash.d/local/before/doist_local_*
-.bash.d/local/after/doist_local_*
+.config/zsh/zsh.d/local/before/doist_local_*
+.config/zsh/zsh.d/local/after/doist_local_*
 
-!.config/
 !.config/git/
 !.config/git/config.work
 # ... etc
@@ -108,10 +109,10 @@ The deny-all approach is maintenance-free: new files added to the personal
 repo don't require updates to the work ignore list.
 
 **Important:** The work layer deliberately does **not** use the `exact_`
-prefix on any directories. The personal layer uses `exact_` on `.bash.d/` to
+prefix on any directories. The personal layer uses `exact_` on `zsh.d/` to
 keep it clean — the work layer only needs to add files, not enforce directory
 contents. Using `exact_` in the work layer would cause it to delete any
-`doist_*.sh` files that exist on disk but haven't been added to the work
+`doist_*.zsh` files that exist on disk but haven't been added to the work
 source yet, which is a problem during transition.
 
 ## Extension Points
@@ -120,26 +121,30 @@ The layers avoid file conflicts entirely through include-based splitting. Each
 config format's native include mechanism lets both layers contribute without
 touching each other's files.
 
-### Bash — `~/.bash.d/local/`
+### Zsh — `~/.config/zsh/zsh.d/local/`
 
-The personal layer's `bootstrap.sh` sources files in this order:
-1. `~/.bash.d/local/before/*` — machine-specific, before main config
-2. `~/.bash.d/*` — main config files (personal layer)
-3. `~/.bash.d/local/after/*` — machine-specific, after main config
+The personal layer's `bootstrap.zsh` sources files in this order:
+1. `~/.config/zsh/zsh.d/local/before/*` — machine-specific, before main config
+2. `~/.config/zsh/zsh.d/*` — main config files (personal layer)
+3. `~/.config/zsh/zsh.d/local/after/*` — machine-specific, after main config
 
-Personal's `.chezmoiignore` has `.bash.d/local/*`, so files placed here by
-the work layer survive personal re-apply.
+Personal's `.chezmoiignore` has `.config/zsh/zsh.d/local/*`, so files placed
+here by the work layer survive personal re-apply.
 
 The work layer uses a **`doist_` prefix convention** for files in both
 `local/before/` and `local/after/`:
 
 | Pattern | Tracked by | Purpose |
 |---------|-----------|---------|
-| `doist_*.sh` | This repo | Work config, managed by chezmoi-work |
-| `doist_local_*.sh` | Nothing | Machine-specific work config, untracked |
+| `doist_*.zsh` | This repo | Work config, managed by chezmoi-work |
+| `doist_local_*.zsh` | Nothing | Machine-specific work config, untracked |
 
 This keeps work config cleanly separated from personal config. To bring an
-existing file into the work repo: `chezmoi-work add ~/.bash.d/local/after/doist_env.sh`.
+existing file into the work repo: `chezmoi-work add ~/.config/zsh/zsh.d/local/after/doist_env.zsh`.
+
+Bash is no longer configured here: the personal layer decommissioned its
+modular bash setup in favour of one minimal `~/.config/bash/init.bash`, and
+every work shell file lives on as its zsh twin.
 
 ### Git — `~/.config/git/config.work`
 

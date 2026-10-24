@@ -23,7 +23,7 @@ Two-layer dotfiles: personal (`jdevera/dotfiles`) + work (this repo). Both use c
 Work layer commands (all available outside interactive shells):
 
 ```bash
-chezmoi-work add ~/.bash.d/local/after/doist_foo.sh   # bring a file into the work repo
+chezmoi-work add ~/.config/zsh/zsh.d/local/after/doist_foo.zsh   # bring a file into the work repo
 chezmoi-work apply                                     # apply work layer only
 chezmoi-work diff                                      # preview work layer changes
 chezmoi-work cd                                        # cd to work source dir
